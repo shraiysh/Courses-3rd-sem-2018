@@ -58,6 +58,16 @@ namespace DataStructure {
             return HEAD == nullptr;
         }
 
+        int contains(int x) {
+            LinkedListNode * currentLinkedListNode = HEAD;
+            while(currentLinkedListNode) {
+                if(currentLinkedListNode->value == x)
+                    return currentLinkedListNode->weight;
+                currentLinkedListNode = currentLinkedListNode->next;
+            }
+            return -1;
+        }
+
         void traverse() {
             // Linked list traversal(used for case with 'B' in assignment 5)
             LinkedListNode * currentLinkedListNode = HEAD;

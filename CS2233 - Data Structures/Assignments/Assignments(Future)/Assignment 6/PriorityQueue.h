@@ -28,7 +28,7 @@ namespace DataStructure {
         int size, maxSize;
 
         PriorityQueue(int maxSize) {
-            myHeapNodes = new Node*[maxSize];
+            myHeapNodes = new Node*[maxSize+1];
             size = 0;
             this->maxSize = maxSize;
         }
@@ -41,27 +41,34 @@ namespace DataStructure {
         void insert(int new_priority_dist, int vertexIndex) {
             int i, prevPriority;
             for(i=1;i<=size;i++) {
-                if(myHeapNodes[i]->vertexIndex == vertexIndex) break;
+                if(myHeapNodes[i]->vertexIndex == vertexIndex)
+                    break;
             }
             if(i!=size+1) {
+                // Found already! Change priority!
                 prevPriority = myHeapNodes[i]->priority_dist;
                 myHeapNodes[i]->priority_dist = new_priority_dist;
                 if(new_priority_dist >= prevPriority) heapify(i);
                 else revHeapify(i); 
             }
-            else if(size+1 < maxSize) {
+            else if(size < maxSize) {
+                // Not found. But the size is less than max possible size.
                 myHeapNodes[++size] = new Node(new_priority_dist, vertexIndex);
                 revHeapify(size);
+            }
+            else {
+                std::cout << "You are inserting over the max size" << std::endl;
             }
         }
 
         void initInf(int limit) {
-            for(int i=1;i<limit;i++) {
+            for(int i=1;i<=limit && limit <= maxSize;i++) {
                 insert(std::numeric_limits<int>::max(), i);
             }
         }
 
         int getRightChildIndex(int index){
+            // 1 based indexing
             return index * 2;
         }
 
@@ -81,12 +88,10 @@ namespace DataStructure {
                 heapify(1);
                 return returningNode;
             }
-            else {
-            }
         }
 
         int isEmpty() {
-            return size < 2;
+            return size == 0;
         }
 
         void revHeapify(int index) {
@@ -102,26 +107,24 @@ namespace DataStructure {
 
         void heapify(int index) {
             int l = getLeftChildIndex(index), r = getRightChildIndex(index);
-            if( !myHeapNodes[index] || (l >= size && r >=size) ) return;
-
-            int next = -1;
-
-            if( (l < size && myHeapNodes[l]->priority_dist < myHeapNodes[index]->priority_dist) 
-                && ((r < size &&  myHeapNodes[l]->priority_dist < myHeapNodes[r]->priority_dist) || (r >= size))) {
-                // Swap with left!
+            int next=-1;
+            if(l<=size && myHeapNodes[l]->priority_dist < myHeapNodes[index]->priority_dist 
+                && (myHeapNodes[l]->priority_dist < myHeapNodes[r]->priority_dist || r > size))
                 next = l;
-            }
-            else if((r < size && myHeapNodes[r]->priority_dist < myHeapNodes[index]->priority_dist) 
-                && ((l < size &&  myHeapNodes[r]->priority_dist < myHeapNodes[l]->priority_dist) || (l >= size))) {
-                // Swap with right!
+            else if(r <= size && myHeapNodes[r]->priority_dist < myHeapNodes[index]->priority_dist
+                && (myHeapNodes[r]->priority_dist < myHeapNodes[l]->priority_dist || l > size))
                 next = r;
-            }
-            if(next!=-1) {
+
+            if(next != -1) {
                 Node * temp = myHeapNodes[next];
                 myHeapNodes[next] = myHeapNodes[index];
                 myHeapNodes[index] = temp;
                 heapify(next);
             }
+        }
+
+        void traverse() {
+            for(int i=1;i<=size;i++) std::cout << myHeapNodes[i]->vertexIndex << " -> " << myHeapNodes[i]->priority_dist << std::endl;
         }
     };
 }
