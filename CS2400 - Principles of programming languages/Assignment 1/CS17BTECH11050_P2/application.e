@@ -3,6 +3,7 @@ create make
 feature
 	men_pref: ARRAY2[INTEGER]
 	women_pref: ARRAY2[INTEGER]
+	marriage: ARRAY[INTEGER]
 	N: INTEGER
 	valid_pref: BOOLEAN
 
@@ -13,7 +14,6 @@ feature
 		do
 			io.read_integer
 			N := io.last_integer
-			print("N=" + N.out + "%N")
 			create men_pref.make_filled (-1, N, N)
 			from i:=1
 			until i > N
@@ -44,22 +44,42 @@ feature
 				end
 				i := i+1
 			end
+			set_is_valid_pref
 
-			print("%N MEN %N")
-			display(men_pref)
-			print("%N WOMEN %N")
-			display(women_pref)
-			get_stable_marriage
+			marriage := get_stable_marriage		-- marriage[i] stores partner of i-th man
+			-- Print our proposal
+			across 1 |..| N as t loop
+				print(marriage.item(t.item).out + "%N")
+			end
 		end
 
-	is_valid_pref
+	set_is_valid_pref
+	-- Sets the value of class variable valid_pref by chacking the preferences: All men must be rank all women and vice versa
 		require
-			men_pref /= Void
-			women_pref /= Void
+			nothing: true
 		local
-			N: INTEGER
+			temp: ARRAY[BOOLEAN]
 		do
-			if men_pref.height = women_pref.width and men_pref.width = women_pref.height
+			valid_pref := men_pref /= Void
+							and women_pref /= Void
+							and men_pref.height = men_pref.width and women_pref.width = women_pref.width and men_pref.height = women_pref.height
+							and N = men_pref.height
+			across 1 |..| N as ic loop
+				create temp.make_filled (false, 1, N)
+				across 1 |..| N as jc loop
+					temp.put (true, men_pref.item (ic.item, jc.item))
+				end
+				valid_pref := valid_pref and across 1 |..| N as jc all
+					temp.item (jc.item)
+				end
+				temp.fill_with (false)
+				across 1 |..| N as jc loop
+					temp.put (true, women_pref.item (ic.item, jc.item))
+				end
+				valid_pref:=valid_pref and across 1 |..| N as jc all
+					temp.item (jc.item)
+				end
+			end
 		end
 
 	display(display_matrix: ARRAY2[INTEGER])
@@ -90,6 +110,7 @@ feature
 
 	m_pref_earlier(m, w, w1: INTEGER): INTEGER
 	require
+		is_valid: valid_pref
 		valid_index_men: m <= men_pref.height
 		valid_index_women: w <= men_pref.width and w1 <= men_pref.width
 	local
@@ -108,12 +129,12 @@ feature
 
 	end
 
-	get_stable_marriage
+	get_stable_marriage: ARRAY[INTEGER]
 		require
-			men_pref /= Void
-			women_pref /= Void
-			men_pref.height = men_pref.width and women_pref.width = women_pref.width and men_pref.height = women_pref.height
-			N = men_pref.height
+			not_void: men_pref /= Void and women_pref /= Void
+			compatiable_dimensions : men_pref.height = men_pref.width and women_pref.width = women_pref.width and men_pref.height = women_pref.height
+			currect_N: N = men_pref.height
+			valid_pref: valid_pref
 		local
 			partner: ARRAY[INTEGER]
 			is_free: ARRAY[BOOLEAN]
@@ -125,45 +146,42 @@ feature
 			from free := N
 			until free <= 0
 			loop
-				print("%N")
 				from w := 1
+				invariant
+					w >= 1 and w <= N + 1
 				until w > N or is_free.item(w) = false
 				loop w := w + 1
 				end
 				-- Found the first free woman index in w
-				print("Next free woman:" + w.out + "%N")
+
 				from i := 1
 				until i > N or is_free.item(w) = true
 				loop
 					m := women_pref.item (w,i)
-					print("her_preference: " + m.out + "%N")
+					-- Found her prefernece in m and if he is not married, marry them!
 					if partner.item (m) = -1 then
-						print("he is free too. map " + m.out + " to " + w.out + "%N")
 						partner.put (w, m)
 						is_free.put (true, w)
 						free := free - 1
 					else
 						-- m is not free
 						w1 := partner.item (m)
-						print("he is not free. He prefers " + w1.out + "%N")
 						if m_pref_earlier(m, w, w1) = w then
-							print(w.out + " is preffered earlier => changing " + m.out + " -> " + w.out + "%N")
 							partner.put (w, m)
 							is_free.put (true, w)
 							is_free.put (false, w1)
-							print(w1.out + "is free again%N")
 						end			-- end inner if
 					end				-- end outer if
 					i := i+1
 				end					-- end inner loop
 			end						-- end outer loop
-			-- Print our proposal
-			print("MAN%TWOMAN%N")
-			from i := 1
-			until i > N
-			loop
-				print(i.out + "%T" + partner.item (i).out + "%N")
-				i := i + 1
-			end
+			Result := partner
+			ensure
+				is_valid_marriage: 
+				across 1 |..| N as ic all
+					across 1 |..| N as jc some
+						Result.item (ic.item) = jc.item
+					end
+				end
 		end							-- end feature
 end
