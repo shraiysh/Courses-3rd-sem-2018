@@ -1,3 +1,0 @@
-The average value is 1205.1
-The standard deviation value is 1064.03
-The median value is 899.357
