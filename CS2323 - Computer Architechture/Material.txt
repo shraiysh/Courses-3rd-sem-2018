@@ -1,0 +1,4 @@
+Textbook
+
+1. The Morgan Kaufmann Series in Computer Architecture and Design) John L. Hennessy, David A. Patterson-Computer Architecture, Sixth Edition_ A Quantitative Approach-Morgan Kaufmann (2017)
+2. Computer Organization and Architechture by Smruti Ranjan Sarangi
