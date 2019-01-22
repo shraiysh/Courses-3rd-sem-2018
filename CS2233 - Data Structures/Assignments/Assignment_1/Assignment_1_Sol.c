@@ -6,7 +6,7 @@ struct digit {
   struct digit * prev, * next;
 };
 struct digit* new_digit() {
-  struct digit *new_digit = (struct digit*)malloc(sizeof(struct digit*));
+  struct digit *new_digit = (struct digit*)malloc(sizeof(struct digit));
   new_digit->value = 0;
   new_digit->prev=NULL;
   new_digit->next = NULL;
@@ -18,7 +18,7 @@ struct list {
   struct digit *TAIL;
 };
 struct list* new_list() {
-  struct list *new_list = (struct list*)malloc(sizeof(struct list*));
+  struct list *new_list = (struct list*)malloc(sizeof(struct list));
   new_list->HEAD = NULL;
   new_list->TAIL = NULL;
   return new_list;
