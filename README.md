@@ -9,3 +9,9 @@ There are some mistakes in some assignments. If someone finds them or wants to i
 1. Sensible commit messages - with reference to the issue it solves. Squash multiple commits if needed.
 2. Work on a new branch
 (Any edits to these guidelines to make workflow smoother are welcome as a pull-request)
+
+### First timers
+
+See CONTRIBUTING.md
+
+Don't hesitate to ask for help. 
